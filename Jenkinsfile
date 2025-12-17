@@ -7,15 +7,6 @@ pipeline {
         TAG = "${env.BUILD_NUMBER}"
     }
 
-    stages {
-
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/saivinay11/up-side-vouge.git'
-            }
-        }
-
         stage('Build Images') {
             steps {
                 script {
