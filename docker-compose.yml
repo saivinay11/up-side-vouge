@@ -1,0 +1,110 @@
+version: '3.9'
+
+services:
+  mongo-auth:
+    image: mongo:6
+    container_name: mongo-auth
+    restart: unless-stopped
+    networks:
+      - upsidevogue-net
+    volumes:
+      - mongo-auth-data:/data/db
+
+  mongo-product:
+    image: mongo:6
+    container_name: mongo-product
+    restart: unless-stopped
+    networks:
+      - upsidevogue-net
+    volumes:
+      - mongo-product-data:/data/db
+
+  postgres-order:
+    image: postgres:15-alpine
+    container_name: postgres-order
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: order_user
+      POSTGRES_PASSWORD: order_pass
+    networks:
+      - upsidevogue-net
+    volumes:
+      - postgres-order-data:/var/lib/postgresql/data
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    restart: unless-stopped
+    environment:
+      PORT: 5001
+      MONGO_URI: mongodb://mongo-auth:27017/authdb
+      JWT_SECRET: supersecretjwt
+    depends_on:
+      - mongo-auth
+    networks:
+      - upsidevogue-net
+    expose:
+      - "5001"
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    restart: unless-stopped
+    environment:
+      PORT: 5002
+      MONGO_URI: mongodb://mongo-product:27017/productdb
+      JWT_SECRET: supersecretjwt
+    depends_on:
+      - mongo-product
+    networks:
+      - upsidevogue-net
+    expose:
+      - "5002"
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    restart: unless-stopped
+    environment:
+      PORT: 5003
+      POSTGRES_URI: postgresql://order_user:order_pass@postgres-order:5432/orderdb
+      JWT_SECRET: supersecretjwt
+    depends_on:
+      - postgres-order
+    networks:
+      - upsidevogue-net
+    expose:
+      - "5003"
+
+  frontend:
+    build: ./frontend
+    container_name: frontend-service
+    restart: unless-stopped
+    networks:
+      - upsidevogue-net
+    expose:
+      - "80"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - frontend
+    networks:
+      - upsidevogue-net
+    ports:
+      - "8080:80"
+
+networks:
+  upsidevogue-net:
+    driver: bridge
+
+volumes:
+  mongo-auth-data:
+  mongo-product-data:
+  postgres-order-data:

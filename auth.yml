@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: auth-service
+  namespace: upsidevouge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: saivinayy1109/auth-service:v1
+          ports:
+            - containerPort: 5001
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: upsidevouge-secrets
+                  key: JWT_SECRET
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: upsidevouge-secrets
+                  key: MONGO_AUTH_URI
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: upsidevouge-secrets
+                  key: POSTGRES_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: upsidevouge
+spec:
+  type: ClusterIP
+  selector:
+    app: auth-service 
+  ports:
+    - port: 5001
+      targetPort: 5001                 

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: upsidevouge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      # 🔹 INIT CONTAINER (WAIT FOR POSTGRES)
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z postgres-orders 5432; do
+                echo "Waiting for Postgres...";
+                sleep 5;
+              done
+
+      containers:
+        - name: order-service
+          image: saivinayy1109/order-service:v1
+          ports:
+            - containerPort: 5003
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: upsidevouge-secrets
+                  key: JWT_SECRET
+
+            - name: POSTGRES_HOST
+              value: postgres-orders
+
+            - name: POSTGRES_PORT
+              value: "5432"
+
+            - name: POSTGRES_DB
+              value: ordersdb
+
+            - name: POSTGRES_USER
+              value: postgres
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: upsidevouge-secrets
+                  key: POSTGRES_PASSWORD
