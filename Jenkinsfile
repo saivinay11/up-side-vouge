@@ -2,35 +2,44 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDS = credentials('docker-hub-creds')
-        DOCKERHUB_USER  = 'saivinayy1109'
-        TAG = "${env.BUILD_NUMBER}"
+        DOCKERHUB_USER = "saivinayy1109"
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
 
         stage('Build Images') {
             steps {
                 script {
-                    sh '''
-                    docker build -t $DOCKERHUB_USER/auth-service:$TAG auth-service
-                    docker build -t $DOCKERHUB_USER/product-service:$TAG product-service
-                    docker build -t $DOCKERHUB_USER/order-service:$TAG order-service
-                    docker build -t $DOCKERHUB_USER/api-gateway:$TAG api-gateway
-                    docker build -t $DOCKERHUB_USER/frontend-service:$TAG frontend
-                    '''
+                    docker.build("${DOCKERHUB_USER}/auth-service:${IMAGE_TAG}", "auth-service")
+                    docker.build("${DOCKERHUB_USER}/product-service:${IMAGE_TAG}", "product-service")
+                    docker.build("${DOCKERHUB_USER}/order-service:${IMAGE_TAG}", "order-service")
+                    docker.build("${DOCKERHUB_USER}/api-gateway:${IMAGE_TAG}", "api-gateway")
+                    docker.build("${DOCKERHUB_USER}/frontend-service:${IMAGE_TAG}", "frontend")
                 }
             }
         }
 
-        stage('Push Images') {
+        stage('Docker Login & Push') {
             steps {
-                script {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
                     sh '''
-                    echo "$DOCKERHUB_CREDS_PSW" | docker login -u "$DOCKERHUB_CREDS_USR" --password-stdin
-                    docker push $DOCKERHUB_USER/auth-service:$TAG
-                    docker push $DOCKERHUB_USER/product-service:$TAG
-                    docker push $DOCKERHUB_USER/order-service:$TAG
-                    docker push $DOCKERHUB_USER/api-gateway:$TAG
-                    docker push $DOCKERHUB_USER/frontend-service:$TAG
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push saivinayy1109/auth-service:${IMAGE_TAG}
+                        docker push saivinayy1109/product-service:${IMAGE_TAG}
+                        docker push saivinayy1109/order-service:${IMAGE_TAG}
+                        docker push saivinayy1109/api-gateway:${IMAGE_TAG}
+                        docker push saivinayy1109/frontend-service:${IMAGE_TAG}
                     '''
                 }
             }
@@ -39,7 +48,7 @@ pipeline {
 
     post {
         success {
-            echo "CI Pipeline completed successfully 🚀"
+            echo "CI Pipeline completed successfully ✅"
         }
         failure {
             echo "CI Pipeline failed ❌"
