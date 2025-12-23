@@ -5,7 +5,8 @@ COPY package.json ./
 COPY package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN npx webpack --mode production
+
 
 # Serve stage
 FROM nginx:alpine
