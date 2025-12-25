@@ -5,7 +5,7 @@ COPY package.json ./
 COPY package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npx webpack --mode production
+RUN npm run build
 
 
 # Serve stage
