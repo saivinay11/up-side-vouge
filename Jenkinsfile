@@ -17,11 +17,13 @@ pipeline {
         stage('Build Images') {
             steps {
                 script {
-                    docker.build("${DOCKERHUB_USER}/auth-service:${IMAGE_TAG}", "auth-service")
-                    docker.build("${DOCKERHUB_USER}/product-service:${IMAGE_TAG}", "product-service")
-                    docker.build("${DOCKERHUB_USER}/order-service:${IMAGE_TAG}", "order-service")
-                    docker.build("${DOCKERHUB_USER}/api-gateway:${IMAGE_TAG}", "api-gateway")
-                    docker.build("${DOCKERHUB_USER}/frontend-service:${IMAGE_TAG}", "frontend")
+                       sh'''
+                         docker.build("${DOCKERHUB_USER}/auth-service:${IMAGE_TAG}", "auth-service")
+                         docker.build("${DOCKERHUB_USER}/product-service:${IMAGE_TAG}", "product-service")
+                         docker.build("${DOCKERHUB_USER}/order-service:${IMAGE_TAG}", "order-service")
+                         docker.build("${DOCKERHUB_USER}/api-gateway:${IMAGE_TAG}", "api-gateway")
+                         docker.build("${DOCKERHUB_USER}/frontend-service:${IMAGE_TAG}", "frontend")
+                      '''   
                 }
             }
         }
