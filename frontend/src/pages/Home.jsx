@@ -17,7 +17,7 @@ export default function Home(){
     <>
       <section className="hero">
         <div className="container">
-          <h1>Elevate Your Wardrobe</h1>
+          <h1>Elevate Your Wardrobe Devops Live</h1>
           <p>Minimalistic silhouettes with a touch of gold. Discover the latest high-fashion pieces.</p>
           <div style={{marginTop:24}}>
             <Link to="/products"><Button className="btn gold">Shop Collection</Button></Link>
