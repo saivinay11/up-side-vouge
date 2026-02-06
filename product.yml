@@ -18,6 +18,11 @@ spec:
           image: saivinayy1109/product-service:v1
           ports:
             - containerPort: 5002
+          envFrom:
+            - configMapRef:
+              name: upsidevouge-config
+            - secretRef:
+              name: upsidevouge-secrets
           env:
             - name: JWT_SECRET
               valueFrom:
