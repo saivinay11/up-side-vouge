@@ -33,9 +33,9 @@ spec:
             - containerPort: 5003
           envFrom:
             - configMapRef:
-              name: upsidevouge-config
+                name: upsidevouge-config
             - secretRef:
-              name: upsidevouge-secrets
+                name: upsidevouge-secrets
           env:
             - name: JWT_SECRET
               valueFrom:
