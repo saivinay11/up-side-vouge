@@ -31,6 +31,11 @@ spec:
           image: saivinayy1109/order-service:v1
           ports:
             - containerPort: 5003
+          envFrom:
+            - configMapRef:
+              name: upsidevouge-config
+            - secretRef:
+              name: upsidevouge-secrets
           env:
             - name: JWT_SECRET
               valueFrom:
@@ -55,3 +60,4 @@ spec:
                 secretKeyRef:
                   name: upsidevouge-secrets
                   key: POSTGRES_PASSWORD
+                  
