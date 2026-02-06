@@ -34,6 +34,12 @@ spec:
                 secretKeyRef:
                   name: upsidevouge-secrets
                   key: POSTGRES_PASSWORD
+          envFrom:
+            - configMapRef:
+                  name: upsidevouge-config
+            - secretRef:
+                  name: upsidevouge-secrets
+    
 ---
 apiVersion: v1
 kind: Service
