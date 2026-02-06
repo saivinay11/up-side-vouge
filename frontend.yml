@@ -20,9 +20,9 @@ spec:
             - containerPort: 80
           envFrom:
             - configMapRef:
-              name: upsidevouge-config
+                name: upsidevouge-config
             - secretRef:
-              name: upsidevouge-secrets
+                name: upsidevouge-secrets
 
 ---
 apiVersion: v1
